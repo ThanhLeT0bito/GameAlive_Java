@@ -232,13 +232,6 @@ public class Player implements KeyListener, MouseListener{
     }
     
     
-    
-    
-    
-    
-    
-    
-
     @Override
     public void mouseClicked(MouseEvent e) {
         this.mouseX = e.getX();
