@@ -18,13 +18,14 @@ public class Bullet {
         private int targetY; // Tọa độ Y của mục tiêu
         private double directionX; // Hướng di chuyển theo trục X
         private double directionY; // Hướng di chuyển theo trục Y
-        private static final float speed = 2; // Tốc độ di chuyển của viên đạn
+        private float speed = 2; // Tốc độ di chuyển của viên đạn
 
-        public Bullet(double x, double y, int targetX, int targetY) {
+        public Bullet(double x, double y, int targetX, int targetY, float speed) {
             this.x = x;
             this.y = y;
             this.targetX = targetX;
             this.targetY = targetY;
+            this.speed = speed;
             // Tính toán hướng di chuyển
             double distance = Math.sqrt((targetX - x) * (targetX - x) + (targetY - y) * (targetY - y));
             directionX = (targetX - x) / distance;
@@ -38,6 +39,16 @@ public class Bullet {
         public double getY() {
             return y;
         }
+
+    public float getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(float speed) {
+        this.speed = speed;
+    }
+        
+        
 
         public void move(int dx, int dy) {
             x += dx;

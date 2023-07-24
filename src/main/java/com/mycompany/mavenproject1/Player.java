@@ -29,6 +29,7 @@ public class Player implements KeyListener, MouseListener{
     public boolean checkFire = true;
     private int mouseX;
     private int mouseY;
+    private float speedBullet = 2;
     //check click mouse
     public boolean isMousePressed = false;
     private int speedPlayer = 10;
@@ -95,8 +96,7 @@ public class Player implements KeyListener, MouseListener{
 
     @Override
     public void keyReleased(KeyEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+        }
     
     ///// FUNCTION
      public void movePlayer(int dx, int dy) {
@@ -105,13 +105,13 @@ public class Player implements KeyListener, MouseListener{
     }
     public void fire(){
        this.checkFire = true;
-       Bullet bulletTemp = new Bullet(this.x + this.width / 2, this.y + this.height / 2,mouseX, mouseY);
+       Bullet bulletTemp = new Bullet(this.x + this.width / 2, this.y + this.height / 2,mouseX, mouseY, speedBullet);
        this.bullets.add(bulletTemp);
     }
     
     public void fire(int mouseX, int mouseY){
        this.checkFire = true;
-       Bullet bulletTemp = new Bullet(this.x + this.width / 2, this.y + this.height / 2,mouseX, mouseY);
+       Bullet bulletTemp = new Bullet(this.x + this.width / 2, this.y + this.height / 2,mouseX, mouseY, speedBullet);
        this.bullets.add(bulletTemp);
        if (lvBullet > 1){
            double angle = Math.toRadians(30); // Góc 45 độ
@@ -121,7 +121,7 @@ public class Player implements KeyListener, MouseListener{
             // Tính toán tọa độ đích mới
             double destinationX = x + Math.cos(angle) * dx - Math.sin(angle) * dy;
             double destinationY = y + Math.sin(angle) * dx + Math.cos(angle) * dy;
-           bulletTemp = new Bullet(this.x + this.width / 2, this.y + this.height / 2,(int) destinationX, (int) destinationY );
+           bulletTemp = new Bullet(this.x + this.width / 2, this.y + this.height / 2,(int) destinationX, (int) destinationY, speedBullet );
            this.bullets.add(bulletTemp);
        }
        if (lvBullet > 2){
@@ -132,12 +132,16 @@ public class Player implements KeyListener, MouseListener{
             // Tính toán tọa độ đích mới
             double destinationX = x + Math.cos(angle) * dx - Math.sin(angle) * dy;
             double destinationY = y + Math.sin(angle) * dx + Math.cos(angle) * dy;
-           bulletTemp = new Bullet(this.x + this.width / 2, this.y + this.height / 2,(int) destinationX, (int) destinationY );
+           bulletTemp = new Bullet(this.x + this.width / 2, this.y + this.height / 2,(int) destinationX, (int) destinationY, speedBullet );
            this.bullets.add(bulletTemp);
        }
     }
     public void PlusHP( int hp){
         this.HP += hp;
+        if (this.HP > 200)
+            this.HP = 200;
+        if (this.HP <0)
+            this.HP = 0;
     }
     
     

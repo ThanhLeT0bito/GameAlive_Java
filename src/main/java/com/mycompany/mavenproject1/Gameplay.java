@@ -61,8 +61,9 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
     private int timeBullet = 3000;
     private int HPBot = 200;
     private int dameBot = 20;
-    private Bot creBot = new Bot(20,20,40,40,Color.green,HPBot);
+    private Bot creBot = new Bot(20,80,40,40,Color.green,HPBot);
     private int speedBot = 2;
+    private float speedBotBullet = 2;
     private Bot creBot2 = new Bot(600,20,40,40,Color.green,HPBot);
     private int speedBot2 = 3;
     private List<Bullet> bulletBots;//List bullet of Bot
@@ -80,7 +81,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
     
     // position buff hp of player 
     private boolean isHP = true;
-    private int BuffHP = 100;
+    private int BuffHP = 30;
     private int BuffHPX = 150, BuffHPY = 150;
     private boolean showTextHp = false;
     
@@ -96,7 +97,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
     
     
     ///img
-    private Image imagePlayer, imageBot, imageDoubleBullet, imageShield;
+    private Image imageBackground, imagePlayer, imageBot, imageDoubleBullet, imageShield, imageBot2, imgBotBullet, imgSpiteBullet;
     
     
     //Khởi tạo các lv game
@@ -115,9 +116,12 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
             // Đọc hình ảnh từ tệp tin
                 imagePlayer = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\testImportImg\\src\\main\\java\\com\\mycompany\\testimportimg\\spriteNew.png"));
                 imageBot = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\testImportImg\\src\\main\\java\\com\\mycompany\\testimportimg\\bot.png"));
+                imageBot2 = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\testImportImg\\src\\main\\java\\com\\mycompany\\testimportimg\\bot2.png"));
                 imageDoubleBullet = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\testImportImg\\src\\main\\java\\com\\mycompany\\testimportimg\\doublebullet.png"));
                 imageShield = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\testImportImg\\src\\main\\java\\com\\mycompany\\testimportimg\\shield.png"));
-
+                imageBackground = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\testImportImg\\src\\main\\java\\com\\mycompany\\testimportimg\\background.jpg"));
+                imgBotBullet = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\testImportImg\\src\\main\\java\\com\\mycompany\\testimportimg\\bot_bullet.png"));
+                imgSpiteBullet = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\testImportImg\\src\\main\\java\\com\\mycompany\\testimportimg\\sprite_bullet.png"));                
                 //image = new ImageIcon(getClass().getClassLoader().getResource("images/sprite.png")).getImage();
             } catch (Exception e) {
                 System.out.println("helllllllo");
@@ -126,6 +130,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
             
         }
         
+         //khoi tao list bullets
         bullets = new ArrayList<>();
         bulletBots = new ArrayList<>();
         //listener click mouse
@@ -138,7 +143,6 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
             player.setMouseX(e.getX());
             player.setMouseY(e.getY());
             TimerBot.start();
-            
             // Xử lý các thao tác sau khi click chuột
         }
         @Override
@@ -152,20 +156,19 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
         }
     });
 //         
-        timer = new Timer(delay, this);
-        timer.start();
+        
         
         ActionListener taskPerformer = (ActionEvent evt) -> {
             if(creBot.getHPBot() >0){
-                Bullet bulletBot = new Bullet(creBot.getX(),creBot.getY(),player.getX() + player.getWidth()/2, player.getY() + player.getHeight()/2);
+                Bullet bulletBot = new Bullet(creBot.getX(),creBot.getY(),player.getX() + player.getWidth()/2, player.getY() + player.getHeight()/2, speedBotBullet);
                 bulletBots.add(bulletBot);
             }
             if(creBot2.getHPBot() > 0){
-                Bullet bulletBot2 = new  Bullet(creBot2.getX(),creBot2.getY(),player.getX() + player.getWidth()/2, player.getY() + player.getHeight()/2);
+                Bullet bulletBot2 = new  Bullet(creBot2.getX(),creBot2.getY(),player.getX() + player.getWidth()/2, player.getY() + player.getHeight()/2,speedBotBullet);
                 bulletBots.add(bulletBot2);
             }
             if(creBot3.getHPBot() > 0){
-                Bullet bullet3 = new  Bullet(creBot3.getX(),creBot3.getY(),player.getX() + player.getWidth()/2, player.getY() + player.getHeight()/2);
+                Bullet bullet3 = new  Bullet(creBot3.getX(),creBot3.getY(),player.getX() + player.getWidth()/2, player.getY() + player.getHeight()/2, speedBotBullet);
                 bulletBots.add(bullet3);
             }
             
@@ -173,6 +176,8 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
         };
         
         TimerBot = new Timer(timeBullet,taskPerformer);
+        timer = new Timer(delay, this);
+        timer.start();
     }
     
     
@@ -182,21 +187,26 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
         //background
         g.setColor(Color.WHITE);
         g.fillRect(0,0,backgroundWH,backgroundWH);
+        g.drawImage(imageBackground, 0, 0,800,800, this);
         
         
         
-        
-        Font font = new Font("Arial", Font.BOLD, 30);
+        Font font = new Font("Arial", Font.BOLD, 25);
         g.setFont(font);
         
         g.setColor(Color.RED);
-        g.drawString("HP Mine: "+ player.getHP(), 20, 50);
+        g.drawString("HP Player: "+ player.getHP(), 20, 50);
+        g.setColor(Color.RED);
+        g.fillRect(20, 70, 200, 10);
+        g.setColor(Color.GREEN);
+        g.fillRect(20, 70, player.getHP(), 10);
         
         g.drawString("Lv:" + LvGame, 300, 50);
         
         
         //vẽ player có image player
-        g.drawImage(imagePlayer, player.getX(), player.getY(),player.getWidth(),player.getHeight(), null);
+        if(player.getHP()>0)
+            g.drawImage(imagePlayer, player.getX(), player.getY(),player.getWidth(),player.getHeight(), null);
 
         //vẽ HP
         if(isHP){
@@ -207,7 +217,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
         //Show text player get HP
         if(showTextHp){
             g.setColor(Color.GREEN);
-            g.drawString("+50 HP", 370, 370);
+            g.drawString("+"+BuffHP +" HP", 370, 370);
         }
        
        
@@ -229,15 +239,16 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
             creBot3.setX(x);
             creBot3.setY(y);
             // Vẽ hình tròn
-            g.setColor(Color.green);
-            g.fillOval(x , y, 40, 40);
+            g.setColor(Color.RED);
+            //g.fillOval(x , y, 40, 40);
+            g.drawImage(imageBot2,creBot3.getX(), creBot3.getY(),40,40, null);
         }
         
         
         if(creBot.getHPBot() >0){
             //g.setColor(creBot.getColor());
             //g.drawImage(imageBot,creBot.getX(), creBot.getY(),creBot.getWidth(),creBot.getHeight(), null);
-            g.drawImage(imageBot,creBot.getX(), creBot.getY(),50,50, null);
+            g.drawImage(imageBot,creBot.getX(), creBot.getY(),creBot.getWidth(),creBot.getHeight(), null);
         }
         if(creBot2.getHPBot() >0){
             g.setColor(creBot2.getColor());
@@ -258,12 +269,14 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 for(int i=0; i< player.getBullets().size(); i++){
                     g2d.setColor(Color.blue);
-                    g2d.fillOval((int) player.getBullets().get(i).getX(),(int)player.getBullets().get(i).getY(), 10, 10);
+//                    g2d.fillOval((int) player.getBullets().get(i).getX(),(int)player.getBullets().get(i).getY(), 10, 10);
+                    g2d.drawImage(imgSpiteBullet,(int) player.getBullets().get(i).getX(),(int)player.getBullets().get(i).getY(), 15, 15, this);
                 }
-                 for(int i=0; i< bulletBots.size(); i++){
-                        g2d.setColor(Color.black);
-                        g2d.fillOval((int) bulletBots.get(i).getX(),(int)bulletBots.get(i).getY(), 10, 10);
-                    }
+                for(int i=0; i< bulletBots.size(); i++){
+                        g2d.setColor(Color.RED);
+                        //g2d.fillOval((int) bulletBots.get(i).getX(),(int)bulletBots.get(i).getY(), 10, 10);
+                        g2d.drawImage(imgBotBullet, (int) bulletBots.get(i).getX(), (int) bulletBots.get(i).getY(), 20, 20, this);
+                }
                 if(creBot.getHPBot() <=0 && creBot2.getHPBot()<= 0 && creBot3.getHPBot() <= 0){
                     g2d.setColor(Color.RED);
                     g2d.drawString("YOU WON !!", 380, 390);
@@ -297,8 +310,8 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
             Rectangle rectW = new Rectangle(BuffHPX,BuffHPY,25,5);
             Rectangle rectH = new Rectangle(BuffHPX + 10,BuffHPY - 10,5,25);
             if(checkIntersects(rectW) || checkIntersects(rectH)){
-                /// player khi did qua hp
-                player.PlusHP(50);
+                /// player khi them hp
+                player.PlusHP(BuffHP);
                 Random random = new Random();
                 BuffHPX = 10 + random.nextInt(720);
                 BuffHPY = 10 + random.nextInt(720);
@@ -314,17 +327,22 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
             if (checkIntersects(rectIncreaseBullet)){
                 int temp = player.getLvBullet() + 1;
                 player.setLvBullet(temp);
-                delayShowIncreaseBullet();
+                delayIncreaseBullet();
                 isIncreaseBullet = false;
+                Random random = new Random();
+                posXIncreaseBullet = 10 + random.nextInt(720);
+                posYIncreaseBullet = 10 + random.nextInt(720);
             }
         }
         //auto move bot
-        creBot.moveBot(speedBot, 0);
+        if(creBot.getHPBot()>0)
+            creBot.moveBot(speedBot, 0);
         if(creBot.getX() >= backgroundWH -creBot.getWidth())
             speedBot = -speedBot;
         if(creBot.getX() <=10)
             speedBot = -speedBot;
-        creBot2.moveBot(0, speedBot);
+        if(creBot2.getHPBot()>0)
+            creBot2.moveBot(0, speedBot);
         if(creBot2.getY()<=10)
             speedBot = -speedBot;
         if(creBot2.getY() >= backgroundWH -creBot2.getWidth())
@@ -382,35 +400,45 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
                 }
             }
         
-        // Cập nhật góc quay
-        angle += Math.toRadians(speedBot3); // Góc quay tăng 1 độ mỗi lần cập nhật
-        repaint();
+        // Cập nhật góc quay cua creBot3
+        if(creBot3.getHPBot()>0)
+            angle += Math.toRadians(speedBot3); // Góc quay tăng 1 độ mỗi lần cập nhật
         
         // Update level when bot die
         if (creBot.getHPBot() <= 0 && creBot2.getHPBot() <= 0 && creBot3.getHPBot() <= 0){
             LvGame += 1;
-            speedBot3 += 0.2;
-            if (LvGame % 2 == 1){
+            if(speedBot3 < 4)
+                speedBot3 += 0.2;
+            
+            //increase HP when player get
+            if (BuffHP <= 100)
+                BuffHP+=5;
+            if (LvGame % 2 == 1 && Math.abs(speedBot) <= 10){
                 if (speedBot >= 0)
                     speedBot += 1;
                 else 
                     speedBot -= 1;
             }
-            if (timeBullet >= 1500)
+            if (timeBullet >= 1200)
                 timeBullet -= 100;
+            if (speedBotBullet < 5)
+                speedBotBullet += 1;
             dameBot+=5;
             HPBot += 200;
             creBot.setHPBot(HPBot);
             creBot2.setHPBot(HPBot);
             creBot3.setHPBot(HPBot);
         }
+        
+        repaint();
+
     }
     
     
     @Override
     public void keyTyped(KeyEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+            char keyChar = e.getKeyChar();
+        }
     
     
 
@@ -456,20 +484,19 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
         
     }
     
-    private void fire()  {
-        checkFire = true;
-        bulletTemp = new Bullet(playerX + 25, playerY + 25,mouseX, mouseY);
-        bullets.add(bulletTemp);
-        bulletTemp = new Bullet(playerX + 25, playerY + 25,mouseX + 70, mouseY + 70);
-        bullets.add(bulletTemp);
-        TimerBot.start();
-    }
-    
+//    private void fire()  {
+//        checkFire = true;
+//        bulletTemp = new Bullet(playerX + 25, playerY + 25,mouseX, mouseY);
+//        bullets.add(bulletTemp);
+//        bulletTemp = new Bullet(playerX + 25, playerY + 25,mouseX + 70, mouseY + 70);
+//        bullets.add(bulletTemp);
+//        TimerBot.start();
+//    }
+//    
 
     @Override
     public void keyReleased(KeyEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+        }
     
     // Kiểm tra va cham player với các vật khác
     private boolean checkIntersects(Rectangle rect){
@@ -488,9 +515,9 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
 //        repaint(playerX, playerY,50,50);
 //    }
     
-    //show text + 50 Hp
+    //show text + BuffHP Hp
     private void showTextPlayerGetHp(){
-        Timer timerShowHp = new Timer(2000, e -> {
+        Timer timerShowHp = new Timer(1000, e -> {
             showTextHp = false;
             repaint();
         });
@@ -515,7 +542,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
         timerHp.start();
     }
     
-    private void delayShowIncreaseBullet(){
+    private void delayIncreaseBullet(){
          Timer timerBullet = new Timer(5000, e -> {
             isIncreaseBullet = true;
             repaint();
