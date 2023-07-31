@@ -17,7 +17,7 @@ public class Mavenproject1 {
         JFrame obj = new JFrame();
 //        obj.pack();
         Gameplay gameplay = new Gameplay();
-        obj.setBounds(10,10,800,800);   
+        obj.setBounds(10,10,1200,800);   
         obj.setTitle("Alive");
         obj.setResizable(false);
         obj.setVisible(true);

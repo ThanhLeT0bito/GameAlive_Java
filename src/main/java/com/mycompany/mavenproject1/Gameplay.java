@@ -170,7 +170,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
         //background
         g.setColor(Color.WHITE);
         g.fillRect(0,0,backgroundWH,backgroundWH);
-        g.drawImage(imageBackground, 0, 0,800,800, this);
+        g.drawImage(imageBackground, 0, 0,getWidth(),getHeight(), this);
         
         
         
@@ -285,11 +285,11 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
         }
         else {
             g.setColor(Color.RED);
-            g.drawString("GAME OVER !!", getWidth()/2 - 100, getWidth()/2);
+            g.drawString("GAME OVER !!", getWidth()/2 - 100, getHeight()/2);
             g.setColor(Color.WHITE);
             font = new Font("Arial", Font.CENTER_BASELINE, 15);
             g.setFont(font);
-            g.drawString("Click enter to Replay !!", getWidth()/2 - 100, getWidth()/2 + 30);
+            g.drawString("Click enter to Replay !!", getWidth()/2 - 100, getHeight()/2 + 30);
             TimerBot.stop();
             timer.stop();
             writeMaxLevel();
@@ -315,8 +315,8 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
                 /// player khi them hp
                 player.PlusHP(BuffHP);
                 Random random = new Random();
-                BuffHPX = 10 + random.nextInt(720);
-                BuffHPY = 10 + random.nextInt(720);
+                BuffHPX = 10 + random.nextInt(getWidth()- 100);
+                BuffHPY = 10 + random.nextInt(getHeight() - 100);
                 showTextPlayerGetHp();
                 showTextHp = true;
                 isHP = false;
@@ -337,18 +337,9 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
             }
         }
         //auto move bot
-        if(creBot.getHPBot()>0)
-            creBot.moveBot(speedBot, 0);
-        if(creBot.getX() >= getWidth() -creBot.getWidth())
-            speedBot = -speedBot;
-        if(creBot.getX() <=10)
-            speedBot = -speedBot;
-        if(creBot2.getHPBot()>0)
-            creBot2.moveBot(0, speedBot2);
-        if(creBot2.getY()<=10)
-            speedBot2 = -speedBot2;
-        if(creBot2.getY() >= getHeight() -creBot2.getWidth())
-            speedBot2 = -speedBot2;
+        
+        AutoMoveBot();
+        
         //player
         if(player.checkFire){
             for(int i=0; i< player.getBullets().size(); i++){
@@ -408,6 +399,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
         
         // Update level when bot die
         if (creBot.getHPBot() <= 0 && creBot2.getHPBot() <= 0 && creBot3.getHPBot() <= 0){
+            //update Game 
             updateGamePlay();
         }
         
@@ -436,7 +428,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
                 }
                 break;
             case KeyEvent.VK_D:
-                if(player.getX() < getWidth())
+                if(player.getX() < getWidth() - 50)
                     player.movePlayer(speedPlayer, 0); // Di chuyển sang phải
                 if(isMousePressed){
                     player.fire(player.getMouseX(), player.getMouseY());
@@ -450,7 +442,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
                 }
                 break;
             case KeyEvent.VK_S:
-                if(player.getY() < getHeight())
+                if(player.getY() < getHeight() - 50)
                     player.movePlayer(0, speedPlayer); // Di chuyển xuống dưới
                 if(isMousePressed){
                     player.fire(player.getMouseX(), player.getMouseY());
@@ -598,6 +590,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
         speedBot2 = 2;
         speedBot3 = 0.5;
         speedBotBullet = 1;
+        dameBot = 20;
         player.setLvBullet(1);
         timeBullet = 3000;
         timer.start();
@@ -627,6 +620,8 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
     }
 
     private void updateGamePlay() {
+        changeRandomBot(creBot);
+        changeRandomBot(creBot2);
         LvGame += 1;
      if(speedBot3 < 4)
         speedBot3 += 0.2;
@@ -654,6 +649,29 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
         creBot.setHPBot(HPBot);
         creBot2.setHPBot(HPBot);
         creBot3.setHPBot(HPBot);    
+    }
+
+    
+    //random x y
+    private void changeRandomBot(Bot bot){
+        Random random = new Random();
+        bot.setX(random.nextInt(50+getWidth()- 150));
+        bot.setY(random.nextInt(50+getHeight()- 150));
+    }
+
+    private void AutoMoveBot() {
+        if(creBot.getHPBot()>0)
+            creBot.moveBot(speedBot, 0);
+        if(creBot.getX() >= getWidth() -creBot.getWidth())
+            speedBot = -speedBot;
+        if(creBot.getX() <=10)
+            speedBot = -speedBot;
+        if(creBot2.getHPBot()>0)
+            creBot2.moveBot(0, speedBot2);
+        if(creBot2.getY()<=10)
+            speedBot2 = -speedBot2;
+        if(creBot2.getY() >= getHeight() -creBot2.getWidth())
+            speedBot2 = -speedBot2;
     }
     
 
