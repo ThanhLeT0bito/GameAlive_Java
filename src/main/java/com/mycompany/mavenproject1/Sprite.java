@@ -10,19 +10,51 @@ import java.awt.Color;
  *
  * @author GF
  */
-public class Bot {
+public class Sprite {
     private int x;
     private int y;
     private int width;
     private int height;
     private int HPBot;
 
-    public Bot(int x, int y, int width, int height, int HPBot) {
+    public Sprite(int x, int y, int width, int height, int HPBot) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.HPBot = HPBot;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(int height) {
+        this.height = height;
     }
 
     public int getHPBot() {
@@ -33,47 +65,4 @@ public class Bot {
         this.HPBot = HPBot;
     }
     
-    
-
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public void moveBot(int dx, int dy) {
-        this.x += dx;
-        this.y += dy;
-    }
-    
-    public void dameHP(int dame){
-        this.HPBot -= dame;
-    }
 }

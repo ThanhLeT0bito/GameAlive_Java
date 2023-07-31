@@ -17,7 +17,7 @@ import java.util.List;
  *
  * @author GF
  */
-public class Player implements KeyListener, MouseListener{
+public class Player  {
     private int x;
     private int y;
     private int width;
@@ -49,54 +49,10 @@ public class Player implements KeyListener, MouseListener{
         lvBullet = 1;
     }
    
-    @Override
-    public void keyTyped(KeyEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-        int keyCode = e.getKeyCode();
-
-        switch (keyCode) {
-            case KeyEvent.VK_A:
-                if(this.x > 10)
-                    movePlayer(-speedPlayer, 0); // Di chuyển sang trái
-                if(isMousePressed){
-                    fire();
-                }
-                break;
-            case KeyEvent.VK_D:
-                if(this.x < 720)
-                    movePlayer(speedPlayer, 0); // Di chuyển sang phải
-                if(isMousePressed){
-                    fire();
-                }
-                break;
-            case KeyEvent.VK_W:
-                if(this.y > 10)
-                    movePlayer(0, -speedPlayer); // Di chuyển lên trên
-                if(isMousePressed){
-                    fire();
-                }
-                break;
-            case KeyEvent.VK_S:
-                if(this.y < 720)
-                    movePlayer(0, speedPlayer); // Di chuyển xuống dưới
-                if(isMousePressed){
-                    fire();
-                }
-                break;
-            case KeyEvent.VK_SPACE:
-                break;
-        }
-    }
-    
     
 
-    @Override
-    public void keyReleased(KeyEvent e) {
-        }
+    
+    
     
     ///// FUNCTION
      public void movePlayer(int dx, int dy) {
@@ -235,34 +191,6 @@ public class Player implements KeyListener, MouseListener{
         this.lvBullet = lvBullet;
     }
     
-    
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        this.mouseX = e.getX();
-        this.mouseY = e.getY();
-        System.out.println(mouseX + "   " + mouseY);
-        this.fire();
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-        isMousePressed = true; 
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        isMousePressed = false;
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
     
     
     
