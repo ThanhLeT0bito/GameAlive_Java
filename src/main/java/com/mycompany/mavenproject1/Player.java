@@ -48,21 +48,11 @@ public class Player  {
         this.checkFire = false;
         lvBullet = 1;
     }
-   
-    
-
-    
-    
     
     ///// FUNCTION
      public void movePlayer(int dx, int dy) {
         this.x += dx;
         this.y += dy;
-    }
-    public void fire(){
-       this.checkFire = true;
-       Bullet bulletTemp = new Bullet(this.x + this.width / 2, this.y + this.height / 2,mouseX, mouseY, speedBullet);
-       this.bullets.add(bulletTemp);
     }
     
     public void fire(int mouseX, int mouseY){

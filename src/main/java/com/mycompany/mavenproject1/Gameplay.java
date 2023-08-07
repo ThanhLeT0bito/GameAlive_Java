@@ -38,24 +38,18 @@ import javax.swing.Timer;
 public class Gameplay extends JPanel implements KeyListener, ActionListener{
     
     
-    
-    private Player player = new Player(200, 200, 40, 60, Color.red);
+    private Player player = new Player(200, 200, 60, 60, Color.red);
     private List<Bullet> bullets; // Danh sách đạn
     private int HPPLayer = 200;
     private int speedPlayer =10;
     private Timer timer;
     private int delay = 10;
-    
     private boolean isPause = false;
-    
-    
     private int mouseX;
     private int mouseY;
-    
     private boolean checkFire = false;
     //check click mouse
     private boolean isMousePressed = false;
-    
     
     //create Bot
     private int timeBullet = 3000;
@@ -80,25 +74,18 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
     private double angle = 0; // Góc quay của hình tròn
     private Bot creBot3 = new Bot(xT ,yT ,40,40,HPBot);
     private double speedBot3 = 0.5;
-
     
     // position buff hp of player 
     private boolean isHP = true;
     private int BuffHP = 30;
     private int BuffHPX = 150, BuffHPY = 150;
     private boolean showTextHp = false;
-    
-    
     // thêm đạn bắn của người chơi (tối đa đươc bắn 3 đạn liền cùng lúc ) width = height = 50
     private boolean isIncreaseBullet = true;
     private int posXIncreaseBullet = 200;
     private int posYIncreaseBullet = 400;
-
-    
     ///hiển thị giảm HP khi trúng đạn
     private boolean showTextDecrease = false;
-    
-    
     ///img
     private Image imageBackground, imagePlayer, imageBot, imageDoubleBullet, imageShield, imageBot2, imgBotBullet, imgSpiteBullet;
     
@@ -160,7 +147,6 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
     @Override
     public void paint(Graphics g){
         super.paintComponent(g);
-        
         //background
         g.drawImage(imageBackground, 0, 0,getWidth(),getHeight(), this);
         
@@ -175,25 +161,18 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
         //vẽ player có image player
         if(player.getHP()>0)
             g.drawImage(imagePlayer, player.getX(), player.getY(),player.getWidth(),player.getHeight(), null);
-
-        
         // Vẽ item Hp và show hp khi player lấy được
         DrawHPAndShow(g);
         
-       
-       
         if (player.getLvBullet() < 3 && isIncreaseBullet){
             g.drawImage(imageDoubleBullet, posXIncreaseBullet, posYIncreaseBullet,50,50, null);
         }
         //Ve BOT
         DrawBots(g);
-        
         //Hiển thị máu bị trừ của bot khi bị trúng đạn
         showTextDecreaseBot(g);
-        
         // Vẽ người chơi 
-        if(player.getHP()>0){
-            
+        if(player.getHP()>0){            
             // Vẽ đạn 
             if(player.checkFire){
                 // Vẽ đạn
@@ -443,7 +422,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
     private void readImages() {
         try {
             // Đọc hình ảnh từ tệp tin
-                imagePlayer = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\mavenproject1\\src\\main\\java\\com\\mycompany\\mavenproject1\\images\\spriteNew.png"));
+                imagePlayer = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\mavenproject1\\src\\main\\java\\com\\mycompany\\mavenproject1\\images\\spriteNew2.png"));
                 imageBot = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\mavenproject1\\src\\main\\java\\com\\mycompany\\mavenproject1\\images\\bot3.png"));
                 imageBot2 = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\mavenproject1\\src\\main\\java\\com\\mycompany\\mavenproject1\\images\\bot2.png"));
                 imageDoubleBullet = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\mavenproject1\\src\\main\\java\\com\\mycompany\\mavenproject1\\images\\doublebullet.png"));
