@@ -18,7 +18,6 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -29,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -42,15 +40,12 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
     
     
     private Player player = new Player(200, 200, 40, 60, Color.red);
-    private int playerX = 200; // Tọa độ X của người chơi
-    private int playerY = 200; // Tọa độ Y của người chơi
     private List<Bullet> bullets; // Danh sách đạn
     private int HPPLayer = 200;
     private int speedPlayer =10;
     private Timer timer;
     private int delay = 10;
     
-    private int backgroundWH = 800;
     private boolean isPause = false;
     
     
@@ -61,8 +56,6 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
     //check click mouse
     private boolean isMousePressed = false;
     
-    //temp from class Bullet
-    private Bullet bulletTemp;
     
     //create Bot
     private int timeBullet = 3000;
@@ -78,13 +71,15 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
     private int whBulletBot = 20;
     
     
-        ///creBot move tròn
-        private int xT = 360; // Tâm x của hình tròn
-        private int yT = 360; // Tâm y của hình tròn
-        private int radius = 350; // Bán kính hình tròn
-        private double angle = 0; // Góc quay của hình tròn
-        private Bot creBot3 = new Bot(xT + radius,yT + radius,40,40,HPBot);
-        private double speedBot3 = 0.5;
+
+    ///creBot move tròn
+    private int xT = 600 ; // Tâm x của hình tròn
+    private int yT = 400 ; // Tâm y của hình tròn
+    
+    private int radius = 320; // Bán kính hình tròn
+    private double angle = 0; // Góc quay của hình tròn
+    private Bot creBot3 = new Bot(xT ,yT ,40,40,HPBot);
+    private double speedBot3 = 0.5;
 
     
     // position buff hp of player 
@@ -119,7 +114,6 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
     
     
     public Gameplay(){
-        
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
         addKeyListener(this);
@@ -127,8 +121,6 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
         
         readImages();
          
-         
-        
          //khoi tao list bullets
         bullets = new ArrayList<>();
         bulletBots = new ArrayList<>();
@@ -155,6 +147,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
             }
         });        
         
+        //bot tự bắn đạn tới player
         autoBotFire();
         
         timer = new Timer(delay, this);
@@ -167,116 +160,48 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
     @Override
     public void paint(Graphics g){
         super.paintComponent(g);
+        
         //background
-        g.setColor(Color.WHITE);
-        g.fillRect(0,0,backgroundWH,backgroundWH);
         g.drawImage(imageBackground, 0, 0,getWidth(),getHeight(), this);
-        
-        
         
         Font font = new Font("Arial", Font.BOLD, 25);
         g.setFont(font);
         
-        g.setColor(Color.RED);
-        g.drawString("HP Player: "+ player.getHP(), 20, 50);
-        g.setColor(Color.RED);
-        g.fillRect(20, 70, 200, 10);
-        g.setColor(Color.GREEN);
-        g.fillRect(20, 70, player.getHP(), 10);
-        
-        g.drawString("Lv:" + LvGame, 270, 50);
-        
-        g.setColor(Color.RED);
-        g.drawString("MaxLv: " + maxLevel, 370, 50);
-        
-        if (isPause){
-            g.setColor(Color.RED);
-            g.drawString("Game Paused", getWidth() / 2 - 50, getHeight() / 2);
-            font = new Font("Arial", Font.BOLD, 15 );
-            g.setFont(font);
-            g.setColor(Color.WHITE);
-            g.drawString("Click space to continous", getWidth() / 2 - 60, getHeight() / 2 + 30);
-        }
-//        else {
-            
+        DrawDetailGame(g);
+        //vẽ thanh HP của Bots
+        drawHPBots(g);
+        //Vẽ màn hình khi pausegame
+        DrawPauseGame(g);
         //vẽ player có image player
         if(player.getHP()>0)
             g.drawImage(imagePlayer, player.getX(), player.getY(),player.getWidth(),player.getHeight(), null);
 
-        //vẽ HP
-        if(isHP){
-            g.setColor(Color.GREEN);
-            g.fillRect(BuffHPX, BuffHPY, 25, 5);
-            g.fillRect(BuffHPX + 10, BuffHPY -10, 5, 25);
-        }
-        //Show text player get HP
-        if(showTextHp){
-            g.setColor(Color.GREEN);
-            g.drawString("+"+BuffHP +" HP", getWidth() / 2, getHeight() / 2);
-        }
+        
+        // Vẽ item Hp và show hp khi player lấy được
+        DrawHPAndShow(g);
+        
        
        
         if (player.getLvBullet() < 3 && isIncreaseBullet){
             g.drawImage(imageDoubleBullet, posXIncreaseBullet, posYIncreaseBullet,50,50, null);
         }
-            //vẽ khiên cho player
-//            int xShield = (int) (playerX  + 70 * Math.cos(-4*angle));
-//            int yShield = (int) (playerY  + 70 * Math.sin(-4*angle));
-//            g.drawImage(imageShield, xShield, yShield,100,100, null);
-        
-       
-        
         //Ve BOT
-        if(creBot3.getHPBot() >0){
-            // Tính toán vị trí x và y dựa vào góc quay và bán kính
-            int x = (int) (xT  + radius * Math.cos(angle));
-            int y = (int) (yT  + radius * Math.sin(angle));
-            creBot3.setX(x);
-            creBot3.setY(y);
-            // Vẽ hình tròn
-            g.setColor(Color.RED);
-            //g.fillOval(x , y, 40, 40);
-            g.drawImage(imageBot2,creBot3.getX(), creBot3.getY(),40,40, null);
-        }
+        DrawBots(g);
         
+        //Hiển thị máu bị trừ của bot khi bị trúng đạn
+        showTextDecreaseBot(g);
         
-        if(creBot.getHPBot() >0){
-            g.drawImage(imageBot,creBot.getX(), creBot.getY(),creBot.getWidth(),creBot.getHeight(), null);
-        }
-        if(creBot2.getHPBot() >0){
-            g.drawImage(imageBot,creBot2.getX(), creBot2.getY(),50,50, null);
-        }
-        
-        // Vẽ người chơi dưới dạng hình vuông màu đỏ
+        // Vẽ người chơi 
         if(player.getHP()>0){
             
-            // Vẽ đạn dưới dạng hình tròn màu đen
+            // Vẽ đạn 
             if(player.checkFire){
-                g.setColor(Color.BLACK);
-                
-                Graphics2D g2d = (Graphics2D) g;
-                AffineTransform transform = new AffineTransform();
-                transform.scale(1.0, 1.0); // Chỉnh scale tùy ý (1.0 là không thay đổi)
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                for(int i=0; i< player.getBullets().size(); i++){
-                    g2d.setColor(Color.blue);
-//                    g2d.fillOval((int) player.getBullets().get(i).getX(),(int)player.getBullets().get(i).getY(), 10, 10);
-                    g2d.drawImage(imgSpiteBullet,(int) player.getBullets().get(i).getX(),(int)player.getBullets().get(i).getY(), 15, 15, this);
-                }
-                for(int i=0; i< bulletBots.size(); i++){
-                        g2d.setColor(Color.RED);
-                        //g2d.fillOval((int) bulletBots.get(i).getX(),(int)bulletBots.get(i).getY(), 10, 10);
-                        g2d.drawImage(imgBotBullet, (int) bulletBots.get(i).getX(), (int) bulletBots.get(i).getY(), whBulletBot, whBulletBot, this);
-                }
-                if(creBot.getHPBot() <=0 && creBot2.getHPBot()<= 0 && creBot3.getHPBot() <= 0){
-                    g2d.setColor(Color.RED);
-                    g2d.drawString("YOU WON !!", 380, 390);
-                    TimerBot.stop();
-                }
-                 
-
+                // Vẽ đạn
+                DrawBullet(g);
             }
-             if (showTextDecrease){
+            
+            //Hiển thị máu bị trừ của player khi bị trúng đạn
+            if (showTextDecrease){
                 g.setColor(Color.RED);
                 font = new Font("Arial", Font.CENTER_BASELINE, 15);
                 g.setFont(font);
@@ -284,15 +209,10 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
             }
         }
         else {
-            g.setColor(Color.RED);
-            g.drawString("GAME OVER !!", getWidth()/2 - 100, getHeight()/2);
-            g.setColor(Color.WHITE);
-            font = new Font("Arial", Font.CENTER_BASELINE, 15);
-            g.setFont(font);
-            g.drawString("Click enter to Replay !!", getWidth()/2 - 100, getHeight()/2 + 30);
-            TimerBot.stop();
-            timer.stop();
-            writeMaxLevel();
+            
+            // Vẽ Game over
+            DrawGameOver(g);
+            
             
         }
         
@@ -306,104 +226,29 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
         
         if (!isPause){
             
-//        timer.start();
-        //player get HP 
-        if (isHP){
-            Rectangle rectW = new Rectangle(BuffHPX,BuffHPY,25,5);
-            Rectangle rectH = new Rectangle(BuffHPX + 10,BuffHPY - 10,5,25);
-            if(checkIntersects(rectW) || checkIntersects(rectH)){
-                /// player khi them hp
-                player.PlusHP(BuffHP);
-                Random random = new Random();
-                BuffHPX = 10 + random.nextInt(getWidth()- 100);
-                BuffHPY = 10 + random.nextInt(getHeight() - 100);
-                showTextPlayerGetHp();
-                showTextHp = true;
-                isHP = false;
-                delayShowBuffHp();
-            }
-        }
-        // Increase Bullet
-        if (player.getLvBullet() < 3 && isIncreaseBullet){
-            Rectangle rectIncreaseBullet = new Rectangle(posXIncreaseBullet,posYIncreaseBullet, 50, 50);
-            if (checkIntersects(rectIncreaseBullet)){
-                int temp = player.getLvBullet() + 1;
-                player.setLvBullet(temp);
-                delayIncreaseBullet();
-                isIncreaseBullet = false;
-                Random random = new Random();
-                posXIncreaseBullet = 10 + random.nextInt(720);
-                posYIncreaseBullet = 10 + random.nextInt(720);
-            }
-        }
-        //auto move bot
-        
-        AutoMoveBot();
-        
-        //player
-        if(player.checkFire){
-            for(int i=0; i< player.getBullets().size(); i++){
-                player.getBullets().get(i).update();
-                
-                Rectangle rect1 = new Rectangle((int)player.getBullets().get(i).getX(),(int) player.getBullets().get(i).getY(), 15, 15);
-                Rectangle rect2 = new Rectangle(creBot.getX(), creBot.getY(), creBot.getWidth(), creBot.getHeight());
-                Rectangle rect3 = new Rectangle(creBot2.getX(), creBot2.getY(), creBot2.getWidth(), creBot2.getHeight());
-                Rectangle rect4 = new Rectangle(creBot3.getX(), creBot3.getY(), creBot3.getWidth(), creBot3.getHeight());
+            //player get HP 
+            checkPlayerGetHP();
 
-                if(rect1.intersects(rect2)){
-                    creBot.dameHP(200);
-                    player.getBullets().remove(i);
-                    break;
-                } 
-                if(rect1.intersects(rect3)){
-                    creBot2.dameHP(200);
-                    player.getBullets().remove(i);
-                    break;
-                }
-                if(rect1.intersects(rect4)){
-                    creBot3.dameHP(200);
-                    player.getBullets().remove(i);
-                    break;
-                }
-                if(player.getBullets().get(i).getX() <= 0 ||
-                   player.getBullets().get(i).getY() <= 0 ||
-                   player.getBullets().get(i).getX() >= getWidth() ||
-                   player.getBullets().get(i).getY() >= getHeight()){
-                    player.getBullets().remove(i);
-                }
+            // Increase Bullet
+            IncreaseBulletPLayer();
+
+            //auto move bot
+            AutoMoveBot();
+            
+            //player intersects 
+            CheckIntersectsOfPLayer();
+
+            //Bot intersects
+            CheckInterSectsOfBot();
+
+
+            // Update level when bot die
+            if (creBot.getHPBot() <= 0 && creBot2.getHPBot() <= 0 && creBot3.getHPBot() <= 0){
+                //update Game 
+                updateGamePlay();
             }
-        }
-        
-            for(int i=0; i< bulletBots.size(); i++){
-                bulletBots.get(i).update();
-                Rectangle rect1 = new Rectangle((int)bulletBots.get(i).getX(),(int) bulletBots.get(i).getY(), whBulletBot, whBulletBot);
-                if(checkIntersects(rect1)  && player.getHP() > 0){
-                    // giảm hp khi player bị đạn BOT bắn
-                    player.PlusHP(-dameBot);
-                    bulletBots.remove(i);
-                    showTextDecreaseHP();
-                    showTextDecrease = true;
-                    break;
-                }
-                if(bulletBots.get(i).getX() <= 0 ||
-                   bulletBots.get(i).getY() <= 0 ||
-                   bulletBots.get(i).getX() >= getWidth() ||
-                   bulletBots.get(i).getY() >= getHeight() ){
-                   bulletBots.remove(i);
-                }
-            }
-        
-        // Cập nhật góc quay cua creBot3
-        if(creBot3.getHPBot()>0)
-            angle += Math.toRadians(speedBot3); // Góc quay tăng 1 độ mỗi lần cập nhật
-        
-        // Update level when bot die
-        if (creBot.getHPBot() <= 0 && creBot2.getHPBot() <= 0 && creBot3.getHPBot() <= 0){
-            //update Game 
-            updateGamePlay();
-        }
-        
-        repaint();
+
+            repaint();
         }
 
     }
@@ -414,8 +259,6 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
             char keyChar = e.getKeyChar();
         }
     
-    
-
     @Override
     public void keyPressed(KeyEvent e) {
         int keyCode = e.getKeyCode();
@@ -449,10 +292,6 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
                 }
                 break;
             case KeyEvent.VK_SPACE:
-//                player.setHP(200);
-//                creBot.setHPBot(200);
-//                creBot2.setHPBot(200);
-//                creBot3.setHPBot(200);
                 if(player.getHP()<=0)
                     break;
                 isPause = !isPause;
@@ -522,6 +361,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
         timerBullet.start();
     }
     
+    
     private void PauseGame(){
         repaint();
         if(isPause){
@@ -582,6 +422,7 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
     
     private void resetGame(){
         LvGame = 1;
+        HPBot = 200;
         player.setHP(200);
         creBot.setHPBot(200);
         creBot2.setHPBot(200);
@@ -602,19 +443,17 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
     private void readImages() {
         try {
             // Đọc hình ảnh từ tệp tin
-                imagePlayer = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\testImportImg\\src\\main\\java\\com\\mycompany\\testimportimg\\spriteNew.png"));
-                imageBot = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\testImportImg\\src\\main\\java\\com\\mycompany\\testimportimg\\bot3.png"));
-                imageBot2 = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\testImportImg\\src\\main\\java\\com\\mycompany\\testimportimg\\bot2.png"));
-                imageDoubleBullet = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\testImportImg\\src\\main\\java\\com\\mycompany\\testimportimg\\doublebullet.png"));
-                imageShield = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\testImportImg\\src\\main\\java\\com\\mycompany\\testimportimg\\shield.png"));
-                imageBackground = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\testImportImg\\src\\main\\java\\com\\mycompany\\testimportimg\\background.jpg"));
-                imgBotBullet = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\testImportImg\\src\\main\\java\\com\\mycompany\\testimportimg\\bot_bullet.png"));
-                imgSpiteBullet = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\testImportImg\\src\\main\\java\\com\\mycompany\\testimportimg\\sprite_bullet.png"));                
+                imagePlayer = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\mavenproject1\\src\\main\\java\\com\\mycompany\\mavenproject1\\images\\spriteNew.png"));
+                imageBot = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\mavenproject1\\src\\main\\java\\com\\mycompany\\mavenproject1\\images\\bot3.png"));
+                imageBot2 = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\mavenproject1\\src\\main\\java\\com\\mycompany\\mavenproject1\\images\\bot2.png"));
+                imageDoubleBullet = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\mavenproject1\\src\\main\\java\\com\\mycompany\\mavenproject1\\images\\doublebullet.png"));
+                imageShield = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\mavenproject1\\src\\main\\java\\com\\mycompany\\mavenproject1\\images\\shield.png"));
+                imageBackground = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\mavenproject1\\src\\main\\java\\com\\mycompany\\mavenproject1\\images\\background.jpg"));
+                imgBotBullet = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\mavenproject1\\src\\main\\java\\com\\mycompany\\mavenproject1\\images\\bot_bullet.png"));
+                imgSpiteBullet = ImageIO.read(new File("C:\\Users\\GF\\Documents\\NetBeansProjects\\mavenproject1\\src\\main\\java\\com\\mycompany\\mavenproject1\\images\\sprite_bullet.png"));                
                 //image = new ImageIcon(getClass().getClassLoader().getResource("images/sprite.png")).getImage();
             } catch (Exception e) {
-                System.out.println("helllllllo");
                 e.printStackTrace();
-                System.out.println("helllllllo");
             
         }
     }
@@ -623,34 +462,33 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
         changeRandomBot(creBot);
         changeRandomBot(creBot2);
         LvGame += 1;
-     if(speedBot3 < 4)
-        speedBot3 += 0.2;
-    //increase HP when player get
-    if (BuffHP <= 100)
-        BuffHP+=5;
-    if (LvGame % 2 == 1 && Math.abs(speedBot) <= 10){
-        if (speedBot >= 0)
-            speedBot += 1;
-        else
-            speedBot -= 1;
-    }
-    if (LvGame % 2 == 1 && Math.abs(speedBot2) <= 10){
-        if (speedBot2 >= 0)
-            speedBot2 += 1;
-        else
-            speedBot2 -= 1;
-    }
-    if (timeBullet >= 1200)
-        timeBullet -= 100;
-    if (speedBotBullet < 5)
-        speedBotBullet += 1;
+        if(speedBot3 < 3)
+           speedBot3 += 0.1;
+       //increase HP when player get
+       if (BuffHP <= 100)
+           BuffHP+=5;
+       if (LvGame % 2 == 1 && Math.abs(speedBot) <= 10){
+           if (speedBot >= 0)
+               speedBot += 1;
+           else
+               speedBot -= 1;
+       }
+       if (LvGame % 2 == 1 && Math.abs(speedBot2) <= 10){
+           if (speedBot2 >= 0)
+               speedBot2 += 1;
+           else
+               speedBot2 -= 1;
+       }
+       if (timeBullet >= 1200)
+           timeBullet -= 100;
+       if (speedBotBullet < 5)
+           speedBotBullet += 1;
         dameBot+=5;
         HPBot += 200;
         creBot.setHPBot(HPBot);
         creBot2.setHPBot(HPBot);
         creBot3.setHPBot(HPBot);    
     }
-
     
     //random x y
     private void changeRandomBot(Bot bot){
@@ -664,14 +502,245 @@ public class Gameplay extends JPanel implements KeyListener, ActionListener{
             creBot.moveBot(speedBot, 0);
         if(creBot.getX() >= getWidth() -creBot.getWidth())
             speedBot = -speedBot;
-        if(creBot.getX() <=10)
-            speedBot = -speedBot;
+        if(creBot.getX() <= creBot.getWidth())
+            speedBot = Math.abs(speedBot);
         if(creBot2.getHPBot()>0)
             creBot2.moveBot(0, speedBot2);
-        if(creBot2.getY()<=10)
-            speedBot2 = -speedBot2;
+        if(creBot2.getY()<= creBot2.getHeight())
+            speedBot2 = Math.abs(speedBot2);
         if(creBot2.getY() >= getHeight() -creBot2.getWidth())
             speedBot2 = -speedBot2;
+        
+        // Cập nhật góc quay cua creBot3
+        if(creBot3.getHPBot()>0)
+            angle += Math.toRadians(speedBot3); // Góc quay tăng 1 độ mỗi lần cập nhật
+    }
+
+    private void showTextDecreaseBot(Graphics g) {
+        if(creBot.showTextDecreaseBot)
+            creBot.showTextDecreaseHP(g);
+        if(creBot2.showTextDecreaseBot)
+            creBot2.showTextDecreaseHP(g);
+        if(creBot3.showTextDecreaseBot)
+            creBot3.showTextDecreaseHP(g);
+    }
+
+    private void CheckIntersectsOfPLayer() {
+        //player
+        if(player.checkFire){
+            for(int i=0; i< player.getBullets().size(); i++){
+                player.getBullets().get(i).update();
+                
+                Rectangle rect1 = new Rectangle((int)player.getBullets().get(i).getX(),(int) player.getBullets().get(i).getY(), 15, 15);
+                Rectangle rect2 = new Rectangle(creBot.getX(), creBot.getY(), creBot.getWidth(), creBot.getHeight());
+                Rectangle rect3 = new Rectangle(creBot2.getX(), creBot2.getY(), creBot2.getWidth(), creBot2.getHeight());
+                Rectangle rect4 = new Rectangle(creBot3.getX(), creBot3.getY(), creBot3.getWidth(), creBot3.getHeight());
+
+                if(rect1.intersects(rect2) && creBot.getHPBot() > 0){
+                    creBot.showTextDecreaseBot = true;
+                    creBot.dameHP(200);
+                    player.getBullets().remove(i);
+                    break;
+                } 
+                if(rect1.intersects(rect3) && creBot2.getHPBot() > 0){
+                    creBot2.showTextDecreaseBot = true;
+                    creBot2.dameHP(200);
+                    player.getBullets().remove(i);
+                    break;
+                }
+                if(rect1.intersects(rect4) && creBot3.getHPBot() > 0){
+                    creBot3.showTextDecreaseBot = true;
+                    creBot3.dameHP(200);
+                    player.getBullets().remove(i);
+                    break;
+                }
+                if(player.getBullets().get(i).getX() <= 0 ||
+                   player.getBullets().get(i).getY() <= 0 ||
+                   player.getBullets().get(i).getX() >= getWidth() ||
+                   player.getBullets().get(i).getY() >= getHeight()){
+                    player.getBullets().remove(i);
+                }
+            }
+        }
+    }
+
+    private void CheckInterSectsOfBot() {
+        for(int i=0; i< bulletBots.size(); i++){
+                bulletBots.get(i).update();
+                Rectangle rect1 = new Rectangle((int)bulletBots.get(i).getX(),(int) bulletBots.get(i).getY(), whBulletBot, whBulletBot);
+                if(checkIntersects(rect1)  && player.getHP() > 0){
+                    // giảm hp khi player bị đạn BOT bắn
+                    player.PlusHP(-dameBot);
+                    bulletBots.remove(i);
+                    showTextDecreaseHP();
+                    showTextDecrease = true;
+                    break;
+                }
+                if(bulletBots.get(i).getX() <= 0 ||
+                   bulletBots.get(i).getY() <= 0 ||
+                   bulletBots.get(i).getX() >= getWidth() ||
+                   bulletBots.get(i).getY() >= getHeight() ){
+                   bulletBots.remove(i);
+                }
+            }
+    }
+
+    private void checkPlayerGetHP() {
+        if (isHP){
+            Rectangle rectW = new Rectangle(BuffHPX,BuffHPY,25,5);
+            Rectangle rectH = new Rectangle(BuffHPX + 10,BuffHPY - 10,5,25);
+            if(checkIntersects(rectW) || checkIntersects(rectH)){
+                /// player khi them hp
+                player.PlusHP(BuffHP);
+                Random random = new Random();
+                BuffHPX = 10 + random.nextInt(getWidth()- 100);
+                BuffHPY = 10 + random.nextInt(getHeight() - 100);
+                showTextPlayerGetHp();
+                showTextHp = true;
+                isHP = false;
+                delayShowBuffHp();
+            }
+        }
+    }
+
+    private void IncreaseBulletPLayer() {
+        if (player.getLvBullet() < 3 && isIncreaseBullet){
+            Rectangle rectIncreaseBullet = new Rectangle(posXIncreaseBullet,posYIncreaseBullet, 50, 50);
+            if (checkIntersects(rectIncreaseBullet)){
+                int temp = player.getLvBullet() + 1;
+                player.setLvBullet(temp);
+                delayIncreaseBullet();
+                isIncreaseBullet = false;
+                Random random = new Random();
+                posXIncreaseBullet = 10 + random.nextInt(720);
+                posYIncreaseBullet = 10 + random.nextInt(720);
+            }
+        }
+    }
+
+    private void drawHPBots(Graphics g) {
+        //creBot
+        g.setColor(Color.red);
+        g.fillRect(getWidth()- 250, 20, 200, 7);
+        g.setColor(Color.GREEN);
+        if (creBot.getHPBot() > 0){
+            double percentCreBot = 200 / ((double)HPBot / (double)creBot.getHPBot());
+            g.fillRect(getWidth()- 250, 20, (int)percentCreBot +1, 7);
+        } else {
+            g.fillRect(getWidth()- 250, 20, 0, 7);
+        }
+        
+        //creBot2
+        g.setColor(Color.red);
+        g.fillRect(getWidth()- 250, 30, 200, 7);
+        g.setColor(Color.GREEN);
+        if (creBot2.getHPBot() > 0){
+            double percentCreBot2 = 200 / ((double)HPBot / (double)creBot2.getHPBot());
+            g.fillRect(getWidth()- 250, 30, (int)percentCreBot2 +1, 7);
+        } else {
+            g.fillRect(getWidth()- 250, 30, 0, 7);
+        }
+        
+        //creBot3
+        g.setColor(Color.red);
+        g.fillRect(getWidth()- 250, 40, 200, 7);
+        g.setColor(Color.GREEN);
+        if (creBot3.getHPBot() > 0){
+            double percentCreBot3 = 200 / ((double)HPBot / (double)creBot3.getHPBot());
+            g.fillRect(getWidth()- 250, 40, (int)percentCreBot3 +1, 7);
+        } else {
+            g.fillRect(getWidth()- 250, 40, 0, 7);
+        }
+        
+    }
+
+    private void DrawBots(Graphics g) {
+        if(creBot3.getHPBot() >0){
+            // Tính toán vị trí x và y dựa vào góc quay và bán kính
+            int x = (int) (xT  + radius * Math.cos(angle));
+            int y = (int) (yT  + radius * Math.sin(angle));
+            creBot3.setX(x);
+            creBot3.setY(y);
+            g.drawImage(imageBot2,creBot3.getX(), creBot3.getY(),40,40, null);
+        }
+        
+        
+        if(creBot.getHPBot() >0){
+            g.drawImage(imageBot,creBot.getX(), creBot.getY(),creBot.getWidth(),creBot.getHeight(), null);
+        }
+        if(creBot2.getHPBot() >0){
+            g.drawImage(imageBot,creBot2.getX(), creBot2.getY(),50,50, null);
+        }
+    }
+
+    private void DrawHPAndShow(Graphics g) {
+        //vẽ HP item
+        if(isHP){
+            g.setColor(Color.GREEN);
+            g.fillRect(BuffHPX, BuffHPY, 25, 5);
+            g.fillRect(BuffHPX + 10, BuffHPY -10, 5, 25);
+        }
+        
+        //Show text player get HP
+        if(showTextHp){
+            g.setColor(Color.GREEN);
+            g.drawString("+"+BuffHP +" HP", getWidth() / 2, getHeight() / 2);
+        }
+    }
+
+    private void DrawDetailGame(Graphics g) {
+        g.setColor(Color.RED);
+        g.drawString("HP Player  "+ player.getHP(), 20, 50);
+        g.setColor(Color.RED);
+        g.fillRect(20, 70, 200, 10);
+        g.setColor(Color.GREEN);
+        g.fillRect(20, 70, player.getHP(), 10);
+        
+        g.drawString("Lv:" + LvGame, 270, 50);
+        
+        g.setColor(Color.RED);
+        g.drawString("MaxLv: " + maxLevel, 370, 50);
+    }
+
+    private void DrawPauseGame(Graphics g) {
+        if (isPause){
+            g.setColor(Color.RED);
+            g.drawString("Game Paused", getWidth() / 2 - 50, getHeight() / 2);
+            Font font = new Font("Arial", Font.BOLD, 15 );
+            g.setFont(font);
+            g.setColor(Color.WHITE);
+            g.drawString("Click space to continous", getWidth() / 2 - 60, getHeight() / 2 + 30);
+        }
+    }
+
+    private void DrawBullet(Graphics g) {
+        Graphics2D g2d = (Graphics2D) g;
+                AffineTransform transform = new AffineTransform();
+                transform.scale(1.0, 1.0); // Chỉnh scale tùy ý (1.0 là không thay đổi)
+                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                for(int i=0; i< player.getBullets().size(); i++){
+                    g2d.drawImage(imgSpiteBullet,(int) player.getBullets().get(i).getX(),(int)player.getBullets().get(i).getY(), 15, 15, this);
+                }
+                for(int i=0; i< bulletBots.size(); i++){
+                        g2d.drawImage(imgBotBullet, (int) bulletBots.get(i).getX(), (int) bulletBots.get(i).getY(), whBulletBot, whBulletBot, this);
+                }
+                if(creBot.getHPBot() <=0 && creBot2.getHPBot()<= 0 && creBot3.getHPBot() <= 0){
+                    g2d.setColor(Color.RED);
+                    g2d.drawString("YOU WON !!", 380, 390);
+                    TimerBot.stop();
+                }
+    }
+
+    private void DrawGameOver(Graphics g) {
+        g.setColor(Color.RED);
+        g.drawString("GAME OVER !!", getWidth()/2 - 100, getHeight()/2);
+        g.setColor(Color.WHITE);
+        Font font = new Font("Arial", Font.CENTER_BASELINE, 15);
+        g.setFont(font);
+        g.drawString("Click enter to Replay !!", getWidth()/2 - 100, getHeight()/2 + 30);
+        TimerBot.stop();
+        timer.stop();
+        writeMaxLevel();     
     }
     
 

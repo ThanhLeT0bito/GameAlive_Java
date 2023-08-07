@@ -5,6 +5,9 @@
 package com.mycompany.mavenproject1;
 
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import javax.swing.Timer;
 
 /**
  *
@@ -16,6 +19,8 @@ public class Bot {
     private int width;
     private int height;
     private int HPBot;
+    
+    public boolean showTextDecreaseBot = false;
 
     public Bot(int x, int y, int width, int height, int HPBot) {
         this.x = x;
@@ -75,5 +80,18 @@ public class Bot {
     
     public void dameHP(int dame){
         this.HPBot -= dame;
+    }
+    
+    
+    public void showTextDecreaseHP(Graphics g){
+        g.setColor(Color.RED);
+        Font font = new Font("Arial", Font.CENTER_BASELINE, 15);
+        g.setFont(font);
+        g.drawString("-200", this.getX()+5, this.getY());
+        Timer timerDecrease = new Timer(50, e -> {
+            this.showTextDecreaseBot = false;
+        });
+        timerDecrease.setRepeats(false);
+        timerDecrease.start();
     }
 }
